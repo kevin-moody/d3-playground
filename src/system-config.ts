@@ -3,6 +3,7 @@
  **********************************************************************************************/
 /** Map relative paths to URLs. */
 const map: any = {
+  "d3" : "vendor/d3/d3.js",
 };
 
 /** User packages configuration. */
@@ -29,6 +30,11 @@ const barrels: string[] = [
   // App specific barrels.
   'app',
   'app/shared',
+  'app/+gdp',
+  'app/+test',
+  'app/+home',
+  'app/header',
+  'app/bar-chart',
   /** @cli-barrel */
 ];
 
