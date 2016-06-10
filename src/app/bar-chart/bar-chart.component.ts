@@ -2,7 +2,7 @@ import { Component, ElementRef, Input, OnInit, OnChanges, AfterViewInit } from '
 
 import * as d3 from 'd3';
 
-import { TimeSeriesData } from './data';
+import { Margin, TimeSeriesData } from './data';
 
 @Component({
   moduleId: module.id,
@@ -23,8 +23,8 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
   private container:d3.Selection<any>;
   private yAxisWidth = 0;
 
-  private margin = {
-    left: 50,
+  private margin:Margin = {
+    left: 55,
     right: 20,
     bottom: 30,
     top: 20
@@ -61,12 +61,12 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
 
     let yScale:d3.scale.Linear<number, number> = d3.scale.linear()
       .domain( [0, d3.max(values) ])
-      .range([0, chartAreaHeight].reverse());
+      .range([0, chartAreaHeight].reverse())
+      .nice();
 
     let yAxis = d3.svg.axis()
         .scale(yScale)
         .ticks(10)
-        // .tickFormat(d3.format('s'))
         .orient("left");
 
     // Scaling X

@@ -49,6 +49,12 @@ export class GdpComponent implements OnInit {
         // store data
         this.data = mapped;
 
+
+        // DEBUG - we could map the data to percentual changes to the last quarter and offer this as another option...
+        // let change = this.data.map(d => d.value).map((value, index, array) => index == 0 ? 0 : value / array[index-1] - 1);
+        // console.warn(change);
+
+
         // store all years for which we have data
         this.years = this.data
           .map(tsd => tsd.date.getUTCFullYear())
