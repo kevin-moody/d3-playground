@@ -38,8 +38,12 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
 
   private dataArea:d3.Selection<any>;
 
-  private transitionTime:number = 1000;
-  private transitionTimeRemoval = this.transitionTime/2;
+  private transitionTime:number = 500;
+
+  private toolTip:d3.Selection<any>;
+
+
+  private xScale:any;
 
   constructor(private elementRef: ElementRef) {
     this.container = d3.select(elementRef.nativeElement); 
@@ -57,8 +61,8 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
     this.chartAreaWidth = this.width - this.margin.left - this.margin.right;
     this.chartAreaHeight = this.height - this.margin.top - this.margin.bottom;
 
-    this.chartAreaClip = this.canvas.append('clipPath')
-      .attr("id", "chart-clipPath")
+    this.chartAreaClip = this.canvas.append('defs').append('clipPath')
+      .attr("id", "clip")
       .append("rect")
       .attr("x", this.margin.left)
       .attr("y", this.margin.top)
@@ -68,7 +72,10 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
     this.dataArea = this.chartArea
       .append('g')
       .attr('id', 'data')
-      .attr('clip-path', 'url(#chart-clipPath)');
+      .attr('clip-path', 'url(#clip)');
+      // .attr('style', "clip-path: url(#clip);");
+
+    this.toolTip = d3.select("#tooltip");
   }
 
   ngOnChanges() {
@@ -92,7 +99,7 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
     // Scaling X
     let dates = this.data.map(d => d.date);
 
-    let xScale = d3.scale.ordinal()
+    this.xScale = d3.scale.ordinal()
       .domain(dates.map(d=>this.toQuarter(d)))
       .rangeBands([0, this.chartAreaWidth], 0.2);
 
@@ -110,7 +117,7 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
     }
 
     let xAxis = d3.svg.axis()
-      .scale(xScale)
+      .scale(this.xScale)
       .tickValues(dateTickValues)
       .tickFormat(q => q.substr(3))
       .orient('bottom')
@@ -119,29 +126,38 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
       .selectAll('rect')
       .data(this.data, d => d.date.toUTCString());
 
-    // existing values get class 'updated'
-    bars.attr('class', 'updated');
-
-    
     // new values get class 'new'
     bars  
       .enter()
       .append('rect')
-      .attr('x', d => xScale(this.toQuarter(d.date)))
+      .attr('x', d => this.xScale(this.toQuarter(d.date)))
       .attr('y', yScale(yScale.domain()[0]))
-      .attr('width', xScale.rangeBand())
+      .attr('width', this.xScale.rangeBand())
       .attr('height', 0)
-      .attr('opacity', 1.0) // remove by fading out
-      .attr('class', 'new');
+      // tooltips
+      .on("mouseover", (datum, index) => {
+        this.toolTip.style('visibility', 'visible');
+        this.toolTip.html(this.toQuarter(datum.date) + "<br/>" + datum.value + " Billion US$"); 
+        let x = +this.dataArea.selectAll('rect').filter(d => d == datum).attr('x') 
+        x = x + this.xScale.rangeBand() / 2;
+        let y = +this.dataArea.selectAll('rect').filter(d => d == datum).attr('y');
+        y = this.chartAreaHeight - y + 90;
+        this.toolTip.style('left', x + "px");
+        this.toolTip.style('bottom', y + "px");
+      })
+      .on("mouseout", (datum) => {
+        this.toolTip
+          .style('visibility', 'hidden');
+      });
+
     
     bars
       .transition()
-      .delay(this.transitionTimeRemoval)
       .duration(this.transitionTime)
       .ease('linear')
-      .attr('x', d => xScale(this.toQuarter(d.date)))
+      .attr('x', d => this.xScale(this.toQuarter(d.date)))
       .attr('y', d => yScale(d.value))
-      .attr('width', xScale.rangeBand())
+      .attr('width', this.xScale.rangeBand())
       .attr('height', d => this.chartAreaHeight - yScale(d.value));
 
     // add y-Axis
@@ -162,10 +178,33 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
       .call(xAxis);
 
     // exit values
+    let itemsRemoved = bars.exit().size();
+    let fadeOutLeft = bars.exit().filter((d) => d.date <= this.data[0].date).size() > 0;
+    let newWidthBetweenBars = this.xScale(this.toQuarter(this.data[1].date)) - this.xScale(this.toQuarter(this.data[0].date));
+
     bars.exit()
       .transition()
-      .duration(this.transitionTimeRemoval)
-      .attr('opacity', 0.0) // remove by fading out
+      .duration(this.transitionTime)
+      .ease('linear')
+      .attr('y', d => yScale(d.value))
+      .attr('height', d => this.chartAreaHeight - yScale(d.value))
+      .attr('x', (d,i) => {
+        // console.log("removal...data/index:" + d + "/" + i);
+        let dateOfMiddleItem = this.data[Math.round(this.data.length/2)].date;
+        let dateOfThisItem = d.date;
+        // console.log("dates of this/middle: " + dateOfThisItem.toUTCString() + "/" + dateOfMiddleItem.toUTCString())
+        // let fadeOutLeft:boolean = dateOfThisItem <= dateOfMiddleItem;
+        let moveBars = fadeOutLeft ? -(itemsRemoved-i) : i - this.data.length + 1;
+
+        // console.log("left?" + fadeOutLeft);
+        // console.log("move bars: " + moveBars);
+        // console.log("xScale: " + xScale(this.toQuarter(d.date)));
+        // console.log("rangeBand: " + xScale.rangeBand());
+
+        let origin = fadeOutLeft ? 0 : this.chartAreaWidth;
+        return origin + moveBars * newWidthBetweenBars;
+      }
+      )
       .remove();    
   }
 
