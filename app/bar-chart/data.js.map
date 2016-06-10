@@ -1,0 +1,1 @@
+{"version":3,"file":"data.js","sourceRoot":"","sources":["data.ts"],"names":[],"mappings":"","sourcesContent":["export interface TimeSeriesData {\n\n    value:number,\n    date:Date\n}\n\nexport interface Margin {\n    left?: number,\n    right?: number,\n    top?: number,\n    bottom?: number\n}\n"]}
