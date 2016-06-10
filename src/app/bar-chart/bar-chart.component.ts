@@ -21,7 +21,7 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
   private height:number;
 
   private container:d3.Selection<any>;
-  private yAxisWidth = 0;
+  // private yAxisWidth = 0;
 
   private margin:Margin = {
     left: 55,
@@ -32,6 +32,11 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
 
   private canvas:d3.Selection<any>;
   private chartArea:d3.Selection<any>;
+  private chartAreaClip:d3.Selection<any>;
+  private chartAreaWidth:number;
+  private chartAreaHeight:number;
+
+  private dataArea:d3.Selection<any>;
 
   constructor(private elementRef: ElementRef) {
     this.container = d3.select(elementRef.nativeElement); 
@@ -44,7 +49,23 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
 
     this.chartArea = this.canvas.append('g')
       .attr('class', 'chart')
-      .attr('transform', 'translate(' + this.margin.left + " " + this.margin.top + ')')
+      .attr('transform', 'translate(' + this.margin.left + " " + this.margin.top + ')');
+
+    this.chartAreaWidth = this.width - this.margin.left - this.margin.right;
+    this.chartAreaHeight = this.height - this.margin.top - this.margin.bottom;
+
+    this.chartAreaClip = this.canvas.append('clipPath')
+      .attr("id", "chart-clipPath")
+      .append("rect")
+      .attr("x", this.margin.left)
+      .attr("y", this.margin.top)
+      .attr("width", this.chartAreaWidth)
+      .attr("height", this.chartAreaHeight);
+
+    this.dataArea = this.chartArea
+      .append('g')
+      .attr('id', 'data')
+      .attr('clip-path', 'url(#chart-clipPath)');
   }
 
   ngOnChanges() {
@@ -52,16 +73,12 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
     if (!this.data)
       return;
 
-    // Calculating chart area dimensions
-    let chartAreaWidth = this.width - this.margin.left - this.margin.right;
-    let chartAreaHeight = this.height - this.margin.top - this.margin.bottom;
-
     // Scaling Y
     let values = this.data.map(d => d.value);
 
     let yScale:d3.scale.Linear<number, number> = d3.scale.linear()
       .domain( [0, d3.max(values) ])
-      .range([0, chartAreaHeight].reverse())
+      .range([0, this.chartAreaHeight].reverse())
       .nice();
 
     let yAxis = d3.svg.axis()
@@ -74,7 +91,7 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
 
     let xScale = d3.scale.ordinal()
       .domain(dates.map(d=>this.toQuarter(d)))
-      .rangeBands([0, chartAreaWidth], 0.2);
+      .rangeBands([0, this.chartAreaWidth], 0.2);
 
     /* Using ordinal scales, we cannot use the ticks() method to get a desired
        number of ticks; D3 will show all of them. A time scale has the issue that
@@ -95,8 +112,7 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
       .tickFormat(q => q.substr(3))
       .orient('bottom')
 
-
-    let bars = this.chartArea
+    let bars = this.dataArea
       .selectAll('rect')
       .data(this.data);
 
@@ -121,7 +137,7 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
       .attr('x', d => xScale(this.toQuarter(d.date)))
       .attr('y', d => yScale(d.value))
       .attr('width', xScale.rangeBand())
-      .attr('height', d => chartAreaHeight - yScale(d.value));
+      .attr('height', d => this.chartAreaHeight - yScale(d.value));
 
     // add y-Axis
     this.chartArea.select("#y-axis").remove();
@@ -131,12 +147,13 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
       .attr("class", "axis y")
       .call(yAxis);
 
+    // add x-Axis
     this.chartArea.select("#x-axis").remove();
     this.chartArea
       .append('g')
       .attr("id", "x-axis")
       .attr("class", "axis x")
-      .attr("transform", "translate(0, " + chartAreaHeight + ")")
+      .attr("transform", "translate(0, " + this.chartAreaHeight + ")")
       .call(xAxis);
 
     // exit values
