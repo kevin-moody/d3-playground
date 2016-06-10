@@ -1,5 +1,26 @@
-<h1>US GDP Data by Quarter</h1>
+<h1>Federal Reserve Economic Data</h1>
+<h2>US GDP Data in Billions of Dollar <small>(Q1/1947 to Q3/2015)</small></h2>
+
+<form class="form-inline" role="form">
+    <div class="form-group">
+        <label for="from">From</label>
+        <select [ngFormControl]="yearFrom" class="form-control" id="from">
+                <option *ngFor="let year of years" [value]="year">{{year}}</option>
+            </select>
+    </div>
+
+    <div class="form-group">
+        <label for="to">To</label>
+        <select [ngFormControl]="yearTo" class="form-control" id="to">
+                <option *ngFor="let year of years" [value]="year">{{year}}</option>
+            </select>
+    </div>
+
+    <button (click)="showAllData()" class="btb btn-primary">Show all data</button>
+</form>
+
+<br>
 
 <div>
-<app-bar-chart [data]="data" [width]="1110" [height]="600"></app-bar-chart>
+    <app-bar-chart [data]="filteredData" [width]="1110" [height]="600"></app-bar-chart>
 </div>

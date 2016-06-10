@@ -25,16 +25,15 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
 
   private margin = {
     left: 50,
-    right: 50,
-    bottom: 50,
-    top: 50
+    right: 20,
+    bottom: 30,
+    top: 20
   }
 
   private canvas:d3.Selection<any>;
   private chartArea:d3.Selection<any>;
 
   constructor(private elementRef: ElementRef) {
-    // console.log(this.elementRef.nativeElement.parentElement);
     this.container = d3.select(elementRef.nativeElement); 
         // window.addEventListener('resize', e => console.log(e)); // tracks the window size!!!
 
@@ -66,8 +65,8 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
 
     let yAxis = d3.svg.axis()
         .scale(yScale)
-        .ticks(20)
-        .tickFormat(d3.format('s'))
+        .ticks(10)
+        // .tickFormat(d3.format('s'))
         .orient("left");
 
     // Scaling X
@@ -150,6 +149,10 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
     console.log(this.elementRef.nativeElement.parentElement.offsetWidth);
    }
 
+   /**
+    * Converts a Javascript Date into a string representation for it's quarter,
+    * e.g., the date "1/1/2005"" gets converted to "Q1 2005".
+    */
    private toQuarter(date:Date):string {
      let string = "Q";
      string += (date.getUTCMonth() / 3) + 1;

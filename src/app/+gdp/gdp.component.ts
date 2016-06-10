@@ -1,4 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { Control } from '@angular/common';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/operator/debounceTime';
 
 import { DataService } from '../data.service';
 import { BarChartComponent } from '../bar-chart/bar-chart.component';
@@ -12,13 +17,27 @@ import { TimeSeriesData } from '../bar-chart/data';
 })
 export class GdpComponent implements OnInit {
 
-  private data:TimeSeriesData[];
+  // all years for which data is available
+  private years:number[];
+  // user-selected filters
+  private yearFrom:Control;
+  private yearTo:Control;
 
-  constructor(private dataService:DataService) {}
+  // all available data
+  private data:TimeSeriesData[];
+  // data filtered by user-selected years
+  private filteredData:TimeSeriesData[];
+
+  constructor(private dataService:DataService) {
+    this.yearFrom = new Control();
+    this.yearTo = new Control();
+  }
 
   ngOnInit() {
     this.dataService.getGdpData()
       .subscribe(data => {
+
+        // map source format to time series data
         let mapped = data.map(single => {
           let typed:TimeSeriesData = {
             value : single[1],
@@ -26,22 +45,48 @@ export class GdpComponent implements OnInit {
           }
           return typed;
         });
-        this.data=mapped;
-        // this.data=mapped.slice(0, 35);
-        // console.log(this.data);
-        // console.log("***BEGIN")
 
-        // for (let i=0; i<10; i++) {
-        //   let date = this.data[i].date;
-        //   console.log(date.getUTCMonth() / 3 + 1);
-        //   // console.log(date.getUTCDate());
-        //   console.log(date.getUTCFullYear());
-        // }
-        // console.log("***END")
+        // store data
+        this.data = mapped;
 
-        // setTimeout(() => this.data = this.data.slice(0,50), 2000);
-        // setTimeout(() => this.data = this.data.slice(0,10), 4000);
+        // store all years for which we have data
+        this.years = this.data
+          .map(tsd => tsd.date.getUTCFullYear())
+          .filter((elem, pos, arr) => arr.indexOf(elem) == pos);
+
+        // ensure that from <= to in all cases
+        this.yearFrom.valueChanges.subscribe(newFrom => {
+          if (this.yearTo.value < newFrom)
+            this.yearTo.updateValue(newFrom);
+        });
+        this.yearTo.valueChanges.subscribe(newTo => {
+          if (this.yearFrom.value > newTo)
+            this.yearFrom.updateValue(newTo);
+        });
+        
+        // whenever one of the years (from,to) change, update the filtered data
+        Observable.combineLatest(this.yearFrom.valueChanges, this.yearTo.valueChanges)
+          .debounceTime(50)
+          .subscribe(yearRange => {
+            let from:number = yearRange[0];
+            let to:number = yearRange[1];
+            this.filteredData = this.data.filter(dataPoint => dataPoint.date.getUTCFullYear() >= from && dataPoint.date.getUTCFullYear() <= to);
+          });
+
+        // set initial values to first and last available year
+        this.showAllData();
       });
+  }
+
+  /**
+   * Sets the filters for year from and year to such that all data is shown.
+   */
+  showAllData() {
+    if (!this.years)
+      return;
+    
+    this.yearFrom.updateValue(this.years[0]);
+    this.yearTo.updateValue(this.years[this.years.length-1]);
   }
 
 }
