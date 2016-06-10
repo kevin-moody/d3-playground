@@ -15,4 +15,10 @@ export class DataService {
         .map(res => res.json())
         .map(data => data.data);
   }
+
+  getCyclingData():Observable<any[]> {
+      return this.http.get('cycling-data.json')
+        .map(res => res.json());
+  }
+  
 }

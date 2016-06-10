@@ -3,8 +3,10 @@ import { Router, Routes , ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from '@angular/ro
 
 import { DataService } from './data.service';
 import { HeaderComponent } from './header';
-import { GdpComponent } from './+gdp';
 import { HomeComponent } from './+home';
+
+import { GdpComponent } from './+gdp';
+import { CyclingComponent } from './+cycling';
 import { TestComponent } from './+test';
 
 @Component({
@@ -17,7 +19,8 @@ import { TestComponent } from './+test';
 @Routes([
   {path: '/', component: HomeComponent},
   {path: '/gdp', component: GdpComponent},
-  {path: '/test', component: TestComponent}
+  {path: '/test', component: TestComponent},
+  {path: '/cycling', component: CyclingComponent}
 ])
 export class D3PlaygroundAppComponent {
 
