@@ -1,5 +1,5 @@
-export interface SingleDimensionalData {
+export interface TimeSeriesData {
 
-    x:number[],
-    labels:string[]
+    value:number,
+    date:Date
 }

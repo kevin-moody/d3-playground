@@ -2,6 +2,8 @@ import { Component, ElementRef, Input, OnInit, OnChanges, AfterViewInit } from '
 
 import * as d3 from 'd3';
 
+import { TimeSeriesData } from './data';
+
 @Component({
   moduleId: module.id,
   selector: 'app-bar-chart',
@@ -10,7 +12,7 @@ import * as d3 from 'd3';
 export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
 
   @Input()
-  private data:any[];
+  private data:TimeSeriesData[];
 
   @Input()
   private width:number;
@@ -51,17 +53,15 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
     if (!this.data)
       return;
 
+    // Calculating chart area dimensions
     let chartAreaWidth = this.width - this.margin.left - this.margin.right;
-//    let domain = d3.extent(this.data, d => d[1]);
-
     let chartAreaHeight = this.height - this.margin.top - this.margin.bottom;
 
-    console.log("original: " + this.width + "/" + this.height);
-    console.log("chart: " + chartAreaWidth + "/" + chartAreaHeight);
-
     // Scaling Y
+    let values = this.data.map(d => d.value);
+
     let yScale:d3.scale.Linear<number, number> = d3.scale.linear()
-      .domain([0, d3.max(this.data.map( d => d[1] ) )])
+      .domain( [0, d3.max(values) ])
       .range([0, chartAreaHeight].reverse());
 
     let yAxis = d3.svg.axis()
@@ -70,27 +70,31 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
         .tickFormat(d3.format('s'))
         .orient("left");
 
-
-
     // Scaling X
-    let xStrings:string[] = this.data.map(d => d[0]);
+    let dates = this.data.map(d => d.date);
 
     let xScale = d3.scale.ordinal()
-      .domain(xStrings)
-      .rangeRoundBands([0, chartAreaWidth], 0.2);
+      .domain(dates.map(d=>this.toQuarter(d)))
+      .rangeBands([0, chartAreaWidth], 0.2);
+
+    /* Using ordinal scales, we cannot use the ticks() method to get a desired
+       number of ticks; D3 will show all of them. A time scale has the issue that
+       our values are ranges, not single dates. Hence, we use a trick to filter
+       out quarters until the desired number is reached. We filter all
+       Q1s and if we still have too many categories, we half the years until the 
+       desired maximum is fulfilled.
+     */
+    let desiredMaximumNumberOfTicks = 20;
+    let dateTickValues = dates.map(d=>this.toQuarter(d)).filter(q => q.startsWith("Q1"));
+    while (dateTickValues.length > desiredMaximumNumberOfTicks) {
+      dateTickValues = dateTickValues.filter((q, idx) => idx % 2 != 1);
+    }
 
     let xAxis = d3.svg.axis()
       .scale(xScale)
-      .ticks(10)
+      .tickValues(dateTickValues)
+      .tickFormat(q => q.substr(3))
       .orient('bottom')
-
-
-    // Generating chart
-	  // let svg = this.container.select('#canvas');
-
-    // let chartArea = svg.append('g')
-    //   .attr('class', 'chart')
-      // .attr('transform', 'translate(' + this.yAxisWidth + ',0)');
 
 
     let bars = this.chartArea
@@ -105,7 +109,7 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
     bars  
       .enter()
       .append('rect')
-      .attr('x', (d, i) => xScale(d[0]))
+      .attr('x', d => xScale(this.toQuarter(d.date)))
       .attr('y', yScale(yScale.domain()[0]))
       .attr('width', xScale.rangeBand())
       .attr('height', 0)
@@ -115,10 +119,10 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
       .transition()
       .duration(1000)
       .ease('linear')
-      .attr('x', (d, i) => xScale(d[0]))
-      .attr('y', d => yScale(d[1]))
+      .attr('x', d => xScale(this.toQuarter(d.date)))
+      .attr('y', d => yScale(d.value))
       .attr('width', xScale.rangeBand())
-      .attr('height', d => chartAreaHeight - yScale(d[1]));
+      .attr('height', d => chartAreaHeight - yScale(d.value));
 
     // add y-Axis
     this.chartArea.select("#y-axis").remove();
@@ -144,5 +148,13 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
   ngAfterViewInit() {
     console.log("after view init")
     console.log(this.elementRef.nativeElement.parentElement.offsetWidth);
+   }
+
+   private toQuarter(date:Date):string {
+     let string = "Q";
+     string += (date.getUTCMonth() / 3) + 1;
+     string += " ";
+     string += date.getUTCFullYear();
+     return string;
    }
 }

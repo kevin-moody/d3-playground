@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { DataService } from '../data.service';
 import { BarChartComponent } from '../bar-chart/bar-chart.component';
-import { SingleDimensionalData } from '../bar-chart/data';
+import { TimeSeriesData } from '../bar-chart/data';
 
 @Component({
   moduleId: module.id,
@@ -12,21 +12,35 @@ import { SingleDimensionalData } from '../bar-chart/data';
 })
 export class GdpComponent implements OnInit {
 
-  private data:any[];
-  private typedData:SingleDimensionalData;
-  
+  private data:TimeSeriesData[];
+
   constructor(private dataService:DataService) {}
 
   ngOnInit() {
     this.dataService.getGdpData()
       .subscribe(data => {
-        let formated:SingleDimensionalData = {
-          x: data.map(d=>d[1]),
-          labels: data.map(d=>d[0].substring(0, 7))
-        };
-        this.typedData = formated;
-        this.data=data.slice(0, 35);
-        setTimeout(() => this.data = data.slice(0,14), 2000);
+        let mapped = data.map(single => {
+          let typed:TimeSeriesData = {
+            value : single[1],
+            date : new Date(single[0])
+          }
+          return typed;
+        });
+        this.data=mapped;
+        // this.data=mapped.slice(0, 35);
+        // console.log(this.data);
+        // console.log("***BEGIN")
+
+        // for (let i=0; i<10; i++) {
+        //   let date = this.data[i].date;
+        //   console.log(date.getUTCMonth() / 3 + 1);
+        //   // console.log(date.getUTCDate());
+        //   console.log(date.getUTCFullYear());
+        // }
+        // console.log("***END")
+
+        // setTimeout(() => this.data = this.data.slice(0,50), 2000);
+        // setTimeout(() => this.data = this.data.slice(0,10), 4000);
       });
   }
 
