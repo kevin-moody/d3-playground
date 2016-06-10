@@ -38,6 +38,9 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
 
   private dataArea:d3.Selection<any>;
 
+  private transitionTime:number = 1000;
+  private transitionTimeRemoval = this.transitionTime/2;
+
   constructor(private elementRef: ElementRef) {
     this.container = d3.select(elementRef.nativeElement); 
         // window.addEventListener('resize', e => console.log(e)); // tracks the window size!!!
@@ -114,7 +117,7 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
 
     let bars = this.dataArea
       .selectAll('rect')
-      .data(this.data);
+      .data(this.data, d => d.date.toUTCString());
 
     // existing values get class 'updated'
     bars.attr('class', 'updated');
@@ -128,11 +131,13 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
       .attr('y', yScale(yScale.domain()[0]))
       .attr('width', xScale.rangeBand())
       .attr('height', 0)
+      .attr('opacity', 1.0) // remove by fading out
       .attr('class', 'new');
     
     bars
       .transition()
-      .duration(1000)
+      .delay(this.transitionTimeRemoval)
+      .duration(this.transitionTime)
       .ease('linear')
       .attr('x', d => xScale(this.toQuarter(d.date)))
       .attr('y', d => yScale(d.value))
@@ -157,7 +162,11 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
       .call(xAxis);
 
     // exit values
-    bars.exit().remove();    
+    bars.exit()
+      .transition()
+      .duration(this.transitionTimeRemoval)
+      .attr('opacity', 0.0) // remove by fading out
+      .remove();    
   }
 
 
