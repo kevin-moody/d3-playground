@@ -18,10 +18,7 @@ export class CyclingComponent implements OnInit {
   ngOnInit() {
     this.dataService.getCyclingData()
       .subscribe(data => {
-        console.log("data" +data.length);
-
         let bestTime = data.map(d => d.Seconds).reduce((a, b) => Math.min(a,b));
-        console.warn("best time: " + bestTime)
         let mapped = data.map(single => {
           let format = {
             place : single.Place,

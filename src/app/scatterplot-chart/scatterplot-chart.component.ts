@@ -73,8 +73,6 @@ export class ScatterplotChartComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    console.log("data changed " + ( this.data ? this.data.length : 'null'));
-
     if (!this.data)
       return;
 
@@ -88,6 +86,7 @@ export class ScatterplotChartComponent implements OnInit, OnChanges {
 
     let yAxis = d3.svg.axis()
         .scale(yScale)
+        .tickValues([1, 5, 10, 15, 20, 25, 30, 35])
         .orient("left");
     
     // Scaling X
