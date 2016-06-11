@@ -78,7 +78,6 @@ export class BarChartComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    console.log("data changed " + ( this.data ? this.data.length : 'null'));
     if (!this.data)
       return;
 

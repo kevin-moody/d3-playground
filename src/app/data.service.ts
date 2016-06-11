@@ -20,5 +20,11 @@ export class DataService {
       return this.http.get('cycling-data.json')
         .map(res => res.json());
   }
+
+  getTemperature():Observable<any[]> {
+      return this.http.get('temperature.json')
+        .map(res => res.json())
+        .map(data => data.monthlyVariance);
+  }
   
 }

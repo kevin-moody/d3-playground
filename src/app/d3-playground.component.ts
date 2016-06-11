@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, Routes , ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from '@angular/router';
+import { TemperatureComponent } from './+temperature';
 
 import { DataService } from './data.service';
 import { HeaderComponent } from './header';
@@ -20,7 +21,8 @@ import { TestComponent } from './+test';
   {path: '/', component: HomeComponent},
   {path: '/gdp', component: GdpComponent},
   {path: '/test', component: TestComponent},
-  {path: '/cycling', component: CyclingComponent}
+  {path: '/cycling', component: CyclingComponent},
+  {path: '/temperature', component: TemperatureComponent}
 ])
 export class D3PlaygroundAppComponent {
 
