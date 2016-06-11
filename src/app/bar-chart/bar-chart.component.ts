@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, OnChanges, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, OnChanges } from '@angular/core';
 
 import * as d3 from 'd3';
 
@@ -9,7 +9,7 @@ import { Margin, TimeSeriesData } from './data';
   selector: 'app-bar-chart',
   templateUrl: 'bar-chart.component.html'
 })
-export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
+export class BarChartComponent implements OnInit, OnChanges {
 
   @Input()
   private data:TimeSeriesData[];
@@ -21,7 +21,6 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
   private height:number;
 
   private container:d3.Selection<any>;
-  // private yAxisWidth = 0;
 
   private margin:Margin = {
     left: 55,
@@ -138,9 +137,9 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
       .on("mouseover", (datum, index) => {
         this.toolTip.style('visibility', 'visible');
         this.toolTip.html(this.toQuarter(datum.date) + "<br/>" + datum.value + " Billion US$"); 
-        let x = +this.dataArea.selectAll('rect').filter(d => d == datum).attr('x') 
-        x = x + this.xScale.rangeBand() / 2;
-        let y = +this.dataArea.selectAll('rect').filter(d => d == datum).attr('y');
+        let element = this.dataArea.selectAll('rect').filter(d => d == datum)
+        let x = +element.attr('x') + this.xScale.rangeBand() / 2;
+        let y = +element.attr('y');
         y = this.chartAreaHeight - y + 90;
         this.toolTip.style('left', x + "px");
         this.toolTip.style('bottom', y + "px");
@@ -208,11 +207,6 @@ export class BarChartComponent implements OnInit, OnChanges, AfterViewInit {
       .remove();    
   }
 
-
-  ngAfterViewInit() {
-    console.log("after view init")
-    console.log(this.elementRef.nativeElement.parentElement.offsetWidth);
-   }
 
    /**
     * Converts a Javascript Date into a string representation for it's quarter,

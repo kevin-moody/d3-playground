@@ -36,6 +36,7 @@ const barrels: string[] = [
   'app/header',
   'app/bar-chart',
   'app/+cycling',
+  'app/scatterplot-chart',
   /** @cli-barrel */
 ];
 
