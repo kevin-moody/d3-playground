@@ -32,6 +32,9 @@ rect {
     /* Position the tooltip */
     position: relative;
     z-index: 10;
+
+    pointer-events: none;
+    
 }
 .graph-tooltip::after {
     content: " ";

@@ -25,18 +25,22 @@ export class MapComponent implements OnInit, OnChanges {
   private container:d3.Selection<any>;
   private canvas:d3.Selection<any>;
   private chartArea:d3.Selection<any>;
+  private zoomLayer:d3.Selection<any>;
   private chartAreaClip:d3.Selection<any>;
   private chartAreaWidth:number;
   private chartAreaHeight:number;
   private dataArea:d3.Selection<any>;
   private toolTip:d3.Selection<any>;
-
+  private meteorites:d3.Selection<any>;
+  private projection:any;
   private margin:Margin = {
     left: -9,
     right: 0,
     bottom: 0,
     top: 210
   }
+
+  // private zoomed = false;
 
   constructor(private elementRef: ElementRef) {
     this.container = d3.select(elementRef.nativeElement); 
@@ -52,6 +56,9 @@ export class MapComponent implements OnInit, OnChanges {
     this.chartArea = this.canvas.append('g')
       .attr('class', 'chart')
       .attr('transform', 'translate(' + this.margin.left + " " + this.margin.top + ')');
+
+    this.zoomLayer = this.chartArea.append('g')
+      .attr('class', 'zoom');
 
     this.chartAreaWidth = this.width - this.margin.left - this.margin.right;
     this.chartAreaHeight = this.height - this.margin.top - this.margin.bottom;
@@ -76,11 +83,11 @@ export class MapComponent implements OnInit, OnChanges {
     if (!this.data || !this.map)
       return;
 
-    let projection = d3.geo.mercator()
+    this.projection = d3.geo.mercator()
 
     let path = d3.geo.path()
-        .projection(projection);
-    let world = this.chartArea
+        .projection(this.projection);
+    let world = this.zoomLayer
       .append("g")
       .attr('class', "map")
       .selectAll("path")
@@ -91,26 +98,71 @@ export class MapComponent implements OnInit, OnChanges {
       .style("stroke", "#a6611a")
       .style("fill", "#fee8c8");
     
-    // this.data.map(d=>d.properties.mass).forEach(d => console.log(d));
-    // let radiusScale = d3.scale.linear()
-    //   .domain(d3.extent(this.data.map(d=>d.properties.mass)))
-    //   .range([2, 20]);
     let radiusScale = d3.scale.pow().exponent(0.4)
       .domain(d3.extent(this.data.map(d=>d.properties.mass)))
       .range([2, 20]);
 
-    let meteorites = this.chartArea
+    this.meteorites = this.zoomLayer
       .append("g")
       .attr('class', "meteorites")
       .selectAll("circle")
+    
+    this.meteorites
       .data(this.data.filter(feature => feature.geometry!= null))
       .enter()
       .append("circle")
-		  .attr("cx", d => projection(d.geometry.coordinates)[0])
-		  .attr("cy", d => projection(d.geometry.coordinates)[1])
-      // .attr("r", d=>2)
+		  .attr("cx", d => this.projection(d.geometry.coordinates)[0])
+		  .attr("cy", d => this.projection(d.geometry.coordinates)[1])
       .attr("r", d=>radiusScale(d.properties.mass))
       .attr("opacity", "0.5")
-      .style("fill", "darkred");
+      .style("fill", "darkred")
+
+      // add tooltips
+      .on("mouseenter", (datum, index) => {
+        console.log("enter");
+        this.toolTip.style('visibility', 'visible');
+        this.toolTip.html("<b>" + datum.properties.name + "</b><br/>Year: " + datum.properties.year + "<br>" + this.getWeight(datum.properties.mass) + "<br>Class: " + datum.properties.recclass.substring(0,10)); 
+        let x = this.projection(datum.geometry.coordinates)[0] - 69;
+        let y = this.chartAreaHeight - this.projection(datum.geometry.coordinates)[1] + 90;
+        this.toolTip.style('left', x + "px");
+        this.toolTip.style('bottom', y + "px");
+      })
+      .on("mouseleave", (datum) => {
+        console.log("leave");
+        this.toolTip
+          .style('visibility', 'hidden');
+      });
+    // setTimeout(() => this.handleZoomClick(), 3000);
+    // setTimeout(() => this.handleZoomClick(), 6000);
+  }
+
+  // handleZoomClick() {
+  //   let scale:number;
+  //   let center:string;
+  //   if (this.zoomed) {
+  //     center = '0 0';
+  //     scale = 1;
+  //   } else {
+  //     center = "-300 -300";
+  //     scale = 4;
+  //   }
+  //   this.zoomed = !this.zoomed;
+  //   this.zoomLayer
+  //     .transition()
+  //     .duration(750)
+  //     .attr('transform', 'translate(' + center + ') scale('+ scale + ')');
+  // }
+
+  getWeight(weight:number):string {
+    if (weight == 0)
+      return "Unknown weight";
+    
+    if (weight < 1000)
+      return "Weight: " + weight + "g";
+    
+    if (weight < 1000000)
+      return "Weight: " + (weight/1000).toFixed(1) + "kg";
+    
+    return "Weight: " + (weight/1000000).toFixed(1) + "t";
   }
 }
