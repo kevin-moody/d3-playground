@@ -3,10 +3,14 @@
  **********************************************************************************************/
 /** Map relative paths to URLs. */
 var map = {
-    "d3": "vendor/d3/d3.js",
+    "d3": "vendor/d3/d3.js"
 };
 /** User packages configuration. */
-var packages = {};
+var packages = {
+    'd3': {
+        format: 'cjs'
+    }
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////
 /***********************************************************************************************
  * Everything underneath this line is managed by the CLI.
@@ -30,6 +34,14 @@ var barrels = [
     'app/+home',
     'app/header',
     'app/bar-chart',
+    'app/+cycling',
+    'app/scatterplot-chart',
+    'app/+temperature',
+    'app/heat-map',
+    'app/+countries',
+    'app/force-directed-graph',
+    'app/+meteorite',
+    'app/map',
 ];
 var cliSystemConfigPackages = {};
 barrels.forEach(function (barrelName) {
