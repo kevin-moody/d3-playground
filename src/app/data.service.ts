@@ -31,5 +31,15 @@ export class DataService {
       return this.http.get('data/countries.json')
         .map(res => res.json());
   }
+
+  getMeteorites():Observable<any> {
+      return this.http.get('data/meteorites.json')
+        .map(res => res.json())
+        .map(data => data.features);
+  }
+  getWorldMap():Observable<any> {
+      return this.http.get('data/world.geojson')
+        .map(res => res.json());
+  }
   
 }

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, Routes , ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from '@angular/router';
+import { MeteoriteComponent } from './+meteorite';
 
 import { DataService } from './data.service';
 import { HeaderComponent } from './header';
@@ -25,7 +26,8 @@ import { TestComponent } from './+test';
   {path: '/test', component: TestComponent},
   {path: '/cycling', component: CyclingComponent},
   {path: '/temperature', component: TemperatureComponent},
-  {path: '/countries', component: CountriesComponent}
+  {path: '/countries', component: CountriesComponent},
+  {path: '/meteorite', component: MeteoriteComponent}
 ])
 export class D3PlaygroundAppComponent {
 

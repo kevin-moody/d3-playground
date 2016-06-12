@@ -15,7 +15,7 @@ const MONTH_NAMES = [
   selector: 'app-heat-map',
   templateUrl: 'heat-map.component.html'
 })
-export class HeatMapComponent implements OnInit {
+export class HeatMapComponent implements OnInit, OnChanges {
 
   @Input()
   private data:any[];

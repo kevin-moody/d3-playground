@@ -3,7 +3,7 @@
  **********************************************************************************************/
 /** Map relative paths to URLs. */
 const map: any = {
-  "d3" : "vendor/d3/d3.js",
+  "d3" : "vendor/d3/d3.js"
 };
 
 /** User packages configuration. */
@@ -41,6 +41,8 @@ const barrels: string[] = [
   'app/heat-map',
   'app/+countries',
   'app/force-directed-graph',
+  'app/+meteorite',
+  'app/map',
   /** @cli-barrel */
 ];
 
