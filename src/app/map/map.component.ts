@@ -119,7 +119,6 @@ export class MapComponent implements OnInit, OnChanges {
 
       // add tooltips
       .on("mouseenter", (datum, index) => {
-        console.log("enter");
         this.toolTip.style('visibility', 'visible');
         this.toolTip.html("<b>" + datum.properties.name + "</b><br/>Year: " + datum.properties.year + "<br>" + this.getWeight(datum.properties.mass) + "<br>Class: " + datum.properties.recclass.substring(0,10)); 
         let x = this.projection(datum.geometry.coordinates)[0] - 69;
@@ -128,7 +127,6 @@ export class MapComponent implements OnInit, OnChanges {
         this.toolTip.style('bottom', y + "px");
       })
       .on("mouseleave", (datum) => {
-        console.log("leave");
         this.toolTip
           .style('visibility', 'hidden');
       });
