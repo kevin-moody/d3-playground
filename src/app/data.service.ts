@@ -11,20 +11,25 @@ export class DataService {
 
 
   getGdpData():Observable<any[]> {
-      return this.http.get('GDP-data.json')
+      return this.http.get('data/GDP-data.json')
         .map(res => res.json())
         .map(data => data.data);
   }
 
   getCyclingData():Observable<any[]> {
-      return this.http.get('cycling-data.json')
+      return this.http.get('data/cycling-data.json')
         .map(res => res.json());
   }
 
   getTemperature():Observable<any[]> {
-      return this.http.get('temperature.json')
+      return this.http.get('data/temperature.json')
         .map(res => res.json())
         .map(data => data.monthlyVariance);
+  }
+
+  getCountries():Observable<any> {
+      return this.http.get('data/countries.json')
+        .map(res => res.json());
   }
   
 }

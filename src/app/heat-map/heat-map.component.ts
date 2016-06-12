@@ -3,7 +3,6 @@ import { Component, ElementRef, Input, OnInit, OnChanges } from '@angular/core';
 import * as d3 from 'd3';
 
 import { Margin } from '../bar-chart/data';
-import { TEMPERATURE_COLORS } from './temperature-palette';
 
 const BASE_TEMPERATURE = 8.66;
 
@@ -130,8 +129,6 @@ export class HeatMapComponent implements OnInit {
 
 
     let variances = this.data.map(d => d.variance);
-    // let colors = ['blue', 'yellow', 'red']
-    // let colors = ['#0000FF', '#FFFF00', '#FF0000']
     let colors = [
       '#d53e4f', '#f46d43', '#fdae61', 
       '#fee08b', '#ffffbf', '#e6f598',
@@ -140,7 +137,7 @@ export class HeatMapComponent implements OnInit {
     let colorScale = d3.scale.quantile()
     .domain([d3.min(variances), d3.max(variances)])
     .range(colors.reverse());
-    console.log(colorScale.quantiles());
+    // console.log(colorScale.quantiles());
     
     // DATA
 
