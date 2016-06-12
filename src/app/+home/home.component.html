@@ -4,10 +4,49 @@
 <p>Several interactive data visualizations to get a feel for the Javascript library D3. Features tested include 
     data binding, scaling, axes, transitions, interactive filtering.
 </p>
-<ul>
-    <li><a [routerLink]="['/test']">Test</a></li>
-    <li><a [routerLink]="['/gdp']">Bar Chart of US GDP data</a></li>
-</ul>
+
+<div class="row">
+  <div class="col-md-2">
+    <div class="thumbnail">
+      <a [routerLink]="['/cycling']"><img src="preview/cycling.png"></a>
+      <div class="caption">
+        <b>Scatterplot</b>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="thumbnail">
+      <a [routerLink]="['/gdp']"><img src="preview/gdp.png"></a>
+      <div class="caption">
+        <b>Bar Chart</b>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="thumbnail">
+      <a [routerLink]="['/countries']"><img src="preview/countries.png"></a>
+      <div class="caption">
+        <b>Graph</b>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="thumbnail">
+      <a [routerLink]="['/temperature']"><img src="preview/temperatures.png"></a>
+      <div class="caption">
+        <b>Heat Map</b>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="thumbnail">
+      <a [routerLink]="['/meteorite']"><img src="preview/meteorites.png"></a>
+      <div class="caption">
+        <b>World Map</b>
+      </div>
+    </div>
+  </div>
+</div>
 
 <p>
     The following resources I found really useful:
