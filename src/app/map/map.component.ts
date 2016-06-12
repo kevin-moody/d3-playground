@@ -47,7 +47,7 @@ export class MapComponent implements OnInit, OnChanges {
     this.canvas
       .append('rect')
       .attr("x", 0).attr("y", 0).attr("width", this.width).attr('height', this.height)
-      .style("fill", "#3F79FF");
+      .style("fill", "rgb(180,215,253)");
 
     this.chartArea = this.canvas.append('g')
       .attr('class', 'chart')
@@ -76,12 +76,10 @@ export class MapComponent implements OnInit, OnChanges {
     if (!this.data || !this.map)
       return;
 
-
     let projection = d3.geo.mercator()
 
     let path = d3.geo.path()
         .projection(projection);
-
     let world = this.chartArea
       .append("g")
       .attr('class', "map")
@@ -93,6 +91,14 @@ export class MapComponent implements OnInit, OnChanges {
       .style("stroke", "#a6611a")
       .style("fill", "#fee8c8");
     
+    // this.data.map(d=>d.properties.mass).forEach(d => console.log(d));
+    // let radiusScale = d3.scale.linear()
+    //   .domain(d3.extent(this.data.map(d=>d.properties.mass)))
+    //   .range([2, 20]);
+    let radiusScale = d3.scale.pow().exponent(0.4)
+      .domain(d3.extent(this.data.map(d=>d.properties.mass)))
+      .range([2, 20]);
+
     let meteorites = this.chartArea
       .append("g")
       .attr('class', "meteorites")
@@ -102,8 +108,9 @@ export class MapComponent implements OnInit, OnChanges {
       .append("circle")
 		  .attr("cx", d => projection(d.geometry.coordinates)[0])
 		  .attr("cy", d => projection(d.geometry.coordinates)[1])
-      .attr("r", 5)
-      .attr("opacity", "0.25")
+      // .attr("r", d=>2)
+      .attr("r", d=>radiusScale(d.properties.mass))
+      .attr("opacity", "0.5")
       .style("fill", "darkred");
   }
 }
