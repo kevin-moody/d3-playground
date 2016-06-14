@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router, Routes , ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from '@angular/router';
 import { MeteoriteComponent } from './+meteorite';
+import { ReactiveMeteoriteComponent } from './+reactive-meteorite';
 
 import { DataService } from './data.service';
 import { HeaderComponent } from './header';
@@ -27,7 +28,8 @@ import { TestComponent } from './+test';
   {path: '/cycling', component: CyclingComponent},
   {path: '/temperature', component: TemperatureComponent},
   {path: '/countries', component: CountriesComponent},
-  {path: '/meteorite', component: MeteoriteComponent}
+  {path: '/meteorite', component: MeteoriteComponent},
+  {path: '/reactive-meteorite', component: ReactiveMeteoriteComponent}
 ])
 export class D3PlaygroundAppComponent {
 

@@ -46,6 +46,7 @@ const barrels: string[] = [
   'app/force-directed-graph',
   'app/+meteorite',
   'app/map',
+  'app/+reactive-meteorite',
   /** @cli-barrel */
 ];
 
