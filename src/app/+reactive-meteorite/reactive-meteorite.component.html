@@ -1,53 +1,59 @@
 <h1>Reactive Meteorite Landings</h1>
 
-
+<div class="row">
 <div class="col-md-4">
 
-<h4>Control Animation</h4>  
-<div id="controls">
-  <form class="form-inline">
-    <button (click)="running.updateValue(!running.value)" type="button" class="btn btn-default">
+  <h4>Control Animation</h4>
+  <div id="controls">
+    <form class="form-inline">
+      <button (click)="running.updateValue(!running.value)" type="button" class="btn btn-default">
       <i *ngIf="!running.value" class="glyphicon glyphicon-play"></i>
-      <i *ngIf="running.value" class="glyphicon glyphicon-stop"></i>
+      <i *ngIf="running.value" class="glyphicon glyphicon-pause"></i>
     </button>
 
-    <div class="form-group">
-      <label for="year">Year</label>
-      <input [ngFormControl]="year" [disabled]="running.value" type="number" class="form-control">
-    </div>
+      <div class="form-group">
+        <label for="year">Year</label>
+        <input [ngFormControl]="year" [disabled]="running.value" type="number" class="form-control">
+      </div>
 
-    <!--<div class="checkbox">
-      <label for="running"><input [ngFormControl]="running" type="checkbox"> Running</label>
+      <!--<div class="form-group">
+      <label for="speed">Speed</label>
+      <input id="speed" type="range" min="1" max="5" step="1" />
     </div>-->
-  </form>
+    </form>
+  </div>
+
+  <hr/>
+
+  <h4>Meteorites in {{ year.value }}</h4>
+
+  <table class="table">
+    <colgroup>
+      <col span="1" style="width: 10%;">
+      <col span="1" style="width: 40%;">
+      <col span="1" style="width: 20%;">
+      <col span="1" style="width: 30%;">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Mass</th>
+        <th>Class</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let m of currentYearMeteorites | async, let i=index">
+        <td>{{ i+1 }}</td>
+        <td>{{ m.properties.name }}</td>
+        <td>{{ m.properties.mass | weight | na }}</td>
+        <td>{{ m.properties.recclass }}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
-<hr/>
-
-<h4>Meteorites in {{ year.value }}</h4>
-
-<table class="table">
-    <colgroup>
-       <col span="1" style="width: 10%;">
-       <col span="1" style="width: 40%;">
-       <col span="1" style="width: 20%;">
-       <col span="1" style="width: 30%;">
-    </colgroup> 
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Name</th>
-      <th>Mass</th>
-      <th>Class</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let m of currentYearMeteorites | async, let i=index">
-      <td>{{ i+1 }}</td>
-      <td>{{ m.properties.name }}</td>
-      <td>{{ m.properties.mass }}</td>
-      <td>{{ m.properties.recclass }}</td>
-    </tr>
-  </tbody>
-</table>
+<div class="col-md-8">
+  <app-reactive-map [map]="worldMap" [data]="currentYearMeteorites | async" width="800" height="600"></app-reactive-map>
+</div>
 </div>
