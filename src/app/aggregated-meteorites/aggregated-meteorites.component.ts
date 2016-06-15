@@ -13,10 +13,33 @@ export class AggregatedMeteoritesComponent implements AfterViewInit {
   @Input()
   private meteorites:Observable<any[]>;
 
+  @Input()
+  private currentYear:Observable<number>;
+
+  private xScale;
+
   constructor() {}
 
   ngAfterViewInit() {
-    this.meteorites.subscribe(meteorites => this.createChart(meteorites))
+    this.meteorites.subscribe(meteorites => this.createChart(meteorites));
+    this.currentYear.subscribe(year => this.updateYearIndicator(year));
+  }
+
+  private updateYearIndicator(year:number) {
+    if (!this.xScale)
+      return;
+
+    let trendLine = d3.select("#trendLine");
+    if (!year || year < 1800 || year > 2015) {
+      trendLine.attr('visibility', 'hidden');
+    } else {
+      trendLine
+        .transition()
+        .duration(200)
+        .attr('x1', this.xScale(year))
+        .attr('x2', this.xScale(year))
+      	.attr('visibility', 'visible');
+    }
   }
 
   private createChart(meteorites:any[]) {
@@ -29,24 +52,22 @@ export class AggregatedMeteoritesComponent implements AfterViewInit {
           return { year:m.properties.year, m: +m.properties.mass/1000000, cnt: 1}
         })
         .reduce((a, b) => {
-          // console.log(a);
-          // console.log(b);
           let x = { m: a.m + b.m, cnt: a.cnt + b.cnt };
           return x;
         }, {m:0, cnt:0});
       meteoritesOfYear['year'] = i;
       aggregated.push(meteoritesOfYear);
     }
-    console.log(aggregated);
 
     var margin = {top: 20, right: 50, bottom: 50, left: 50},
     width = 300 - margin.left - margin.right,
     height = 200 - margin.top - margin.bottom;
 
 
-    var x = d3.scale.linear()
+    this.xScale = d3.scale.linear()
       .domain(years)
       .range([0, width]);
+    var x = this.xScale;
 
     var y1 = d3.scale.linear()
       .domain(d3.extent(aggregated.map(am => am.cnt)))
@@ -83,12 +104,13 @@ export class AggregatedMeteoritesComponent implements AfterViewInit {
     svg.append("path")
         .datum(aggregated)
         .attr("class", "area")
+        .style("fill", 'lightgray')
         .attr("d", area);
 
-    svg.append("path")
-        .datum(aggregated)
-        .attr("class", "line")
-        .attr("d", path);
+    // svg.append("path")
+    //     .datum(aggregated)
+    //     .attr("class", "line")
+    //     .attr("d", path);
 
     svg.append("g")
         .attr("class", "x axis")
@@ -116,9 +138,13 @@ export class AggregatedMeteoritesComponent implements AfterViewInit {
         .style("text-anchor", "end")
         .text("Weight in tons");
 
-    // TODO: add chart
-
-    console.log(years);
+    d3.select('#canvas').on('click',  function(datum, index) {
+    var coordinates = [0, 0];
+coordinates = d3.mouse(this);
+var x = coordinates[0];
+var y = coordinates[1];
+  console.log(coordinates);
+    });
   }
 
 }

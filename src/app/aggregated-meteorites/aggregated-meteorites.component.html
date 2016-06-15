@@ -1,7 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 300 200">
+<svg xmlns="http://www.w3.org/2000/svg" 
+width="100%" height="100%" 
+viewBox="0 0 300 200"
+id="canvas">
     <!-- background is a full width rectangle in ocean color -->
     <!--<rect x="0" y="0" [attr.width]="300" [attr.height]="200" style="green"></rect>-->
-    
-    <g class="data1" id="data1" transform="translate(50,20)"></g>
-    <g class="data2" id="data2"></g>
+    <g transform="translate(50,20)">  
+      <g class="data1" id="data1"></g>
+      <g class="data2" id="data2"></g>
+      <g class="indicator" id="indicator">
+          <line id="trendLine" 
+            x1="0" y1="130" 
+            x2="0" y2="0" 
+            stroke="red" 
+            stroke-width="2"/>
+      </g>
+    </g>
 </svg>

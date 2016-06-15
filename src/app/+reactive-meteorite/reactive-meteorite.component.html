@@ -6,16 +6,19 @@
   <h4>Control Animation</h4>
   <div id="controls">
     <form class="form-inline">
-      <button (click)="running.updateValue(!running.value)" type="button" class="btn btn-default">
-      <i *ngIf="!running.value" class="glyphicon glyphicon-play"></i>
-      <i *ngIf="running.value" class="glyphicon glyphicon-pause"></i>
+      <button (click)="runningControl.updateValue(!runningControl.value)" type="button" class="btn btn-default">
+      <i *ngIf="!runningControl.value" class="glyphicon glyphicon-play"></i>
+      <i *ngIf="runningControl.value" class="glyphicon glyphicon-pause"></i>
     </button>
 
       <div class="form-group">
         <label for="year">Year</label>
-        <input [ngFormControl]="year" [disabled]="running.value" type="number" class="form-control">
+        <input [ngFormControl]="yearControl" [disabled]="runningControl.value" type="number" class="form-control" min="1800" max="2015">
       </div>
 
+      <div class="form-group">
+        <a (click)="yearControl.updateValue(1800)" class="btn">Reset</a>
+      </div>
       <!--<div class="form-group">
       <label for="speed">Speed</label>
       <input id="speed" type="range" min="1" max="5" step="1" />
@@ -26,7 +29,7 @@
   <hr/>
 
   <h4>Aggregated meteorite data</h4>
-  <app-aggregated-meteorites [meteorites]="allMeteorites"></app-aggregated-meteorites>
+  <app-aggregated-meteorites [meteorites]="allMeteorites" [currentYear]="year"></app-aggregated-meteorites>
 
 
   <h4>Meteorites in {{ year.value }}</h4>

@@ -11,7 +11,7 @@ import { Weight } from '../weight.pipe';
 import { Na } from '../na.pipe';
 
 const startingYear = 1800;
-const animationSpeed = 3000;
+const animationSpeed = 200;
 @Component({
   moduleId: module.id,
   selector: 'app-reactive-meteorite',
@@ -24,16 +24,17 @@ export class ReactiveMeteoriteComponent implements OnInit {
   private data:any[];
   private worldMap:any;
 
-  private running:Control;
-  private year:Control;
+  private runningControl:Control;
+  private yearControl:Control;
 
+  private year:Observable<number>;
   private allMeteorites:Observable<any[]>;
   private currentYearMeteorites:Observable<any[]>;
 
   constructor(private dataService:DataService) {
     this.dataService.getWorldMap().subscribe(data => this.worldMap = data);
-    this.running = new Control(false);
-    this.year = new Control(startingYear);
+    this.runningControl = new Control(false);
+    this.yearControl = new Control(startingYear);
 
     /** 
      * We take the observable with all meteorites in GeoJSON format, apply
@@ -42,7 +43,6 @@ export class ReactiveMeteoriteComponent implements OnInit {
      * to a different subset.
      */
     this.allMeteorites = this.dataService.getMeteorites()
-      .do(a => console.log(a.length))
       .flatMap(array => Observable.from(array))
       .map(meteorite => {
         let mapped:any = {};
@@ -56,8 +56,8 @@ export class ReactiveMeteoriteComponent implements OnInit {
       .refCount()
 
     /** We declare observables for our controls with a starting value */
-    let running$:Observable<boolean> = this.running.valueChanges.startWith(false);
-    let year$:Observable<number> = this.year.valueChanges.startWith(startingYear);
+    let running$:Observable<boolean> = this.runningControl.valueChanges.startWith(false);
+    this.year = this.yearControl.valueChanges.startWith(startingYear);
 
     /**
      * The timer emits an event according to our aninmation speed, but only
@@ -70,12 +70,18 @@ export class ReactiveMeteoriteComponent implements OnInit {
         (running, tick) => running ? 1 : 0
       )
       .filter(tick => tick == 1)
-      .subscribe(x => this.year.updateValue(+this.year.value + 1));
+      .subscribe(x => {
+        let nextYear = +this.yearControl.value + 1;
+        if (nextYear > 2015)
+          this.runningControl.updateValue(false);
+        else
+          this.yearControl.updateValue(nextYear)
+      });
 
     /**
      * Creating an observable which emits all meteorites of the currently selected year.
      */
-    this.currentYearMeteorites = year$.withLatestFrom(this.allMeteorites, (year, meteorites) => {
+    this.currentYearMeteorites = this.year.withLatestFrom(this.allMeteorites, (year, meteorites) => {
       return meteorites.filter(m => m.properties.year == year);
     })
     .startWith([]);
