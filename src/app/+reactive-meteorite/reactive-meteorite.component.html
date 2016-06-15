@@ -30,7 +30,7 @@
   <hr/>
 
   <h4>Aggregated meteorite data</h4>
-  <app-aggregated-meteorites [meteorites]="allMeteorites" [currentYear]="year"></app-aggregated-meteorites>
+  <app-aggregated-meteorites (selectedYear)="changeYear($event)" [meteorites]="allMeteorites" [currentYear]="year"></app-aggregated-meteorites>
 
 
   <h4>Meteorites in {{ year | async }}</h4>

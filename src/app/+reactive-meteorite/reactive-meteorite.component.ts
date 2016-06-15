@@ -81,11 +81,11 @@ export class ReactiveMeteoriteComponent implements OnInit {
         let nextYear = +this.yearControl.value + 1;
         if (nextYear > END_YEAR) {
           if (this.loopControl.value)
-            this.yearControl.updateValue(STARTING_YEAR);
+            this.changeYear(STARTING_YEAR);
           else
             this.runningControl.updateValue(false);
         } else {
-          this.yearControl.updateValue(nextYear);
+          this.changeYear(nextYear);
         }
       });
 
@@ -96,6 +96,10 @@ export class ReactiveMeteoriteComponent implements OnInit {
       return meteorites.filter(m => m.properties.year == year);
     })
     .startWith([]);
+  }
+
+  changeYear(newYear:number) {
+    this.yearControl.updateValue(newYear);
   }
 
 }

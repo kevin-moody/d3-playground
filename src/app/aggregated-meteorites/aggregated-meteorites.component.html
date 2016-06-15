@@ -4,7 +4,8 @@ viewBox="0 0 300 200"
 id="canvas">
     <!-- background is a full width rectangle in ocean color -->
     <!--<rect x="0" y="0" [attr.width]="300" [attr.height]="200" style="green"></rect>-->
-    <g transform="translate(50,20)">  
+    <g transform="translate(50,20)">
+      <rect id="bg" width="200" height="120" style="fill:white"></rect>
       <g class="data1" id="data1"></g>
       <g class="data2" id="data2"></g>
       <g class="indicator" id="indicator">
@@ -12,7 +13,8 @@ id="canvas">
             x1="0" y1="130" 
             x2="0" y2="0" 
             stroke="red" 
-            stroke-width="2"/>
+            stroke-width="2"
+            style="pointer-events:none"/>
       </g>
     </g>
 </svg>
