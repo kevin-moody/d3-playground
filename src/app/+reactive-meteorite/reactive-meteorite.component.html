@@ -33,7 +33,7 @@
   <app-aggregated-meteorites (selectedYear)="changeYear($event)" [meteorites]="allMeteorites" [currentYear]="year"></app-aggregated-meteorites>
 
 
-  <h4>Meteorites in {{ year | async }}</h4>
+  <h4>{{ (currentYearMeteorites | async).length }} Meteorites in {{ year | async }}</h4>
   <table class="table">
     <colgroup>
       <col span="1" style="width: 10%;">

@@ -112,13 +112,15 @@ export class AggregatedMeteoritesComponent implements AfterViewInit {
       .datum(aggregated)
       .attr("class", "area")
       .style("fill", 'lightgray')
-      .attr("d", area);
+      .attr("d", area)
+      .style("pointer-events", "none");
 
     svg.append("path")
       .attr("d", line(aggregated))
       .attr("stroke", "black")
       .attr("stroke-width", 1)
-      .attr("fill", "none");
+      .attr("fill", "none")
+      .style("pointer-events", "none");
 
     svg.append("g")
       .attr("class", "x axis")
