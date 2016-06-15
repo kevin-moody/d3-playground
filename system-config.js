@@ -42,6 +42,10 @@ var barrels = [
     'app/force-directed-graph',
     'app/+meteorite',
     'app/map',
+    'app/+reactive-meteorite',
+    'app/reactive-map',
+    'app/aggregated-meteorites',
+    'app/pipes',
 ];
 var cliSystemConfigPackages = {};
 barrels.forEach(function (barrelName) {

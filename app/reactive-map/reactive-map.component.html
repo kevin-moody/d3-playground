@@ -1,0 +1,20 @@
+<svg 
+    [attr.width]="width"
+    [attr.height]="height"
+    id="canvas">
+
+    <!-- background is a full width rectangle in ocean color -->
+    <rect x="0" y="0" [attr.width]="width" [attr.height]="height" style="fill:rgb(180,215,253)"></rect>
+    
+    <!-- zoom player -->
+    <g class="zoom" id="zoom" transform="scale(0.8) translate(0,200)">
+        <!-- this should be the world map in the background -->
+        <g id="map"class="map">
+
+        </g>
+
+        <!-- here we put in all meteorites -->
+        <g class="meteorites" id="meteorites">
+        </g>
+    </g>
+</svg>
