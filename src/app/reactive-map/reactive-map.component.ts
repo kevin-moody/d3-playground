@@ -3,7 +3,6 @@ import { Observable } from 'rxjs/Observable';
 
 import * as d3 from 'd3';
 import {DataService } from '../data.service';
-import { Margin } from '../bar-chart/data';
 
 @Component({
   moduleId: module.id,
@@ -74,7 +73,6 @@ export class ReactiveMapComponent implements AfterViewInit {
   }
 
   private updateMap(mapData) {
-      console.warn("DRAWING MAP = THIS SHOULD APPEAR ONLY ONCE")
       let path = d3.geo.path().projection(this.projection);
       this.zoomLayer.select("#map")
         .selectAll("path")

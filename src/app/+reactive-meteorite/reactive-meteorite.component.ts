@@ -50,6 +50,7 @@ export class ReactiveMeteoriteComponent implements OnInit {
         mapped.properties.year = new Date(mapped.properties.year).getUTCFullYear();
         return mapped;
       })
+      .filter(m => m.properties.year >= 1800)
       .toArray()
       .publishReplay(1)
       .refCount()

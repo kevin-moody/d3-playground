@@ -1,4 +1,4 @@
-<h1>Reactive Meteorite Landings</h1>
+<h1>Reactive Meteorite Landings <small>since 1800</small></h1>
 
 <div class="row">
 <div class="col-md-4">
@@ -25,12 +25,11 @@
 
   <hr/>
 
+  <h4>Aggregated meteorite data</h4>
+  <app-aggregated-meteorites [meteorites]="allMeteorites"></app-aggregated-meteorites>
+
+
   <h4>Meteorites in {{ year.value }}</h4>
-  <!--{{ "xx" + (currentYearMeteorites | async) + "xx"}}-->
-  <!--<p *ngIf="!(currentYearMeteorites | async) || (currentYearMeteorites | async).length == 0">
-    There were no meteorites recorded for this year.
-  </p>
-  <table *ngIf="(currentYearMeteorites | async) && (currentYearMeteorites | async).length > 0" class="table">-->
   <table class="table">
     <colgroup>
       <col span="1" style="width: 10%;">
@@ -64,9 +63,6 @@
       </tr>
     </tbody>
   </table>
-
-  <h4>Aggregated meteorite data</h4>
-  <app-aggregated-meteorites></app-aggregated-meteorites>
 
 </div>
 
