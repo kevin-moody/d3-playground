@@ -26,6 +26,7 @@ export class ReactiveMeteoriteComponent implements OnInit {
 
   private runningControl:Control;
   private yearControl:Control;
+  private loopControl:Control;
 
   private year:Observable<number>;
   private allMeteorites:Observable<any[]>;
@@ -35,6 +36,7 @@ export class ReactiveMeteoriteComponent implements OnInit {
     this.dataService.getWorldMap().subscribe(data => this.worldMap = data);
     this.runningControl = new Control(false);
     this.yearControl = new Control(startingYear);
+    this.loopControl = new Control(true);
 
     /** 
      * We take the observable with all meteorites in GeoJSON format, apply
@@ -72,10 +74,14 @@ export class ReactiveMeteoriteComponent implements OnInit {
       .filter(tick => tick == 1)
       .subscribe(x => {
         let nextYear = +this.yearControl.value + 1;
-        if (nextYear > 2015)
-          this.runningControl.updateValue(false);
-        else
-          this.yearControl.updateValue(nextYear)
+        if (nextYear > 2015) {
+          if (this.loopControl.value)
+            this.yearControl.updateValue(1800);
+          else
+            this.runningControl.updateValue(false);
+        } else {
+          this.yearControl.updateValue(nextYear);
+        }
       });
 
     /**

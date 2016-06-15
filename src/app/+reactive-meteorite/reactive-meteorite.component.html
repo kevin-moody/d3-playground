@@ -1,4 +1,4 @@
-<h1>Reactive Meteorite Landings <small>since 1800</small></h1>
+<h1>Reactive Meteorite Landings <small>1800 - 2015</small></h1>
 
 <div class="row">
 <div class="col-md-4">
@@ -19,6 +19,12 @@
       <div class="form-group">
         <a (click)="yearControl.updateValue(1800)" class="btn">Reset</a>
       </div>
+
+      <div class="form-group">
+        <label for="loop">Loop</label>
+        <input [ngFormControl]="loopControl" type="checkbox" class="form-control">
+      </div>
+
       <!--<div class="form-group">
       <label for="speed">Speed</label>
       <input id="speed" type="range" min="1" max="5" step="1" />
@@ -32,7 +38,7 @@
   <app-aggregated-meteorites [meteorites]="allMeteorites" [currentYear]="year"></app-aggregated-meteorites>
 
 
-  <h4>Meteorites in {{ year.value }}</h4>
+  <h4>Meteorites in {{ year | async }}</h4>
   <table class="table">
     <colgroup>
       <col span="1" style="width: 10%;">
