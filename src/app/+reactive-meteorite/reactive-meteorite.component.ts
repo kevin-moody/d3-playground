@@ -10,8 +10,10 @@ import { AggregatedMeteoritesComponent } from '../aggregated-meteorites';
 import { Weight } from '../weight.pipe';
 import { Na } from '../na.pipe';
 
-const startingYear = 1800;
-const animationSpeed = 200;
+const STARTING_YEAR = 1800;
+const END_YEAR = 2015;
+const ANIMATION_SPEED = 200;
+
 @Component({
   moduleId: module.id,
   selector: 'app-reactive-meteorite',
@@ -20,6 +22,9 @@ const animationSpeed = 200;
   pipes: [Weight, Na]
 })
 export class ReactiveMeteoriteComponent implements OnInit {
+
+  private startingYear = STARTING_YEAR;
+  private endYear = END_YEAR;
 
   private data:any[];
   private worldMap:any;
@@ -35,7 +40,7 @@ export class ReactiveMeteoriteComponent implements OnInit {
   constructor(private dataService:DataService) {
     this.dataService.getWorldMap().subscribe(data => this.worldMap = data);
     this.runningControl = new Control(false);
-    this.yearControl = new Control(startingYear);
+    this.yearControl = new Control(STARTING_YEAR);
     this.loopControl = new Control(true);
 
     /** 
@@ -52,14 +57,14 @@ export class ReactiveMeteoriteComponent implements OnInit {
         mapped.properties.year = new Date(mapped.properties.year).getUTCFullYear();
         return mapped;
       })
-      .filter(m => m.properties.year >= 1800)
+      .filter(m => m.properties.year >= STARTING_YEAR)
       .toArray()
       .publishReplay(1)
       .refCount()
 
     /** We declare observables for our controls with a starting value */
     let running$:Observable<boolean> = this.runningControl.valueChanges.startWith(false);
-    this.year = this.yearControl.valueChanges.startWith(startingYear);
+    this.year = this.yearControl.valueChanges.startWith(STARTING_YEAR);
 
     /**
      * The timer emits an event according to our aninmation speed, but only
@@ -68,15 +73,15 @@ export class ReactiveMeteoriteComponent implements OnInit {
      */
     let timer$ = Observable.combineLatest(
         running$,
-        Observable.interval(animationSpeed),
+        Observable.interval(ANIMATION_SPEED),
         (running, tick) => running ? 1 : 0
       )
       .filter(tick => tick == 1)
       .subscribe(x => {
         let nextYear = +this.yearControl.value + 1;
-        if (nextYear > 2015) {
+        if (nextYear > END_YEAR) {
           if (this.loopControl.value)
-            this.yearControl.updateValue(1800);
+            this.yearControl.updateValue(STARTING_YEAR);
           else
             this.runningControl.updateValue(false);
         } else {

@@ -1,4 +1,4 @@
-<h1>Reactive Meteorite Landings <small>1800 - 2015</small></h1>
+<h1>Reactive Meteorite Landings <small>{{startingYear}} - {{endYear}}</small></h1>
 
 <div class="row">
 <div class="col-md-4">
@@ -13,22 +13,17 @@
 
       <div class="form-group">
         <label for="year">Year</label>
-        <input [ngFormControl]="yearControl" [disabled]="runningControl.value" type="number" class="form-control" min="1800" max="2015">
+        <input [ngFormControl]="yearControl" [disabled]="runningControl.value" type="number" class="form-control" [attr.min]="startingYear" [attr.max]="endYear">
       </div>
 
       <div class="form-group">
-        <a (click)="yearControl.updateValue(1800)" class="btn">Reset</a>
+        <a (click)="yearControl.updateValue(startingYear)" class="btn">Reset</a>
       </div>
 
       <div class="form-group">
         <label for="loop">Loop</label>
         <input [ngFormControl]="loopControl" type="checkbox" class="form-control">
       </div>
-
-      <!--<div class="form-group">
-      <label for="speed">Speed</label>
-      <input id="speed" type="range" min="1" max="5" step="1" />
-    </div>-->
     </form>
   </div>
 
