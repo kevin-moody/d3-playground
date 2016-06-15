@@ -48,6 +48,7 @@ const barrels: string[] = [
   'app/map',
   'app/+reactive-meteorite',
   'app/reactive-map',
+  'app/aggregated-meteorites',
   /** @cli-barrel */
 ];
 

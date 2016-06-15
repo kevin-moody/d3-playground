@@ -1,21 +1,20 @@
-import { Component, ElementRef, Input, OnInit, OnChanges, SimpleChange } from '@angular/core';
+import { Component, ElementRef, Input, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
 
 import * as d3 from 'd3';
-
+import {DataService } from '../data.service';
 import { Margin } from '../bar-chart/data';
 
 @Component({
   moduleId: module.id,
   selector: 'app-reactive-map',
-  templateUrl: 'reactive-map.component.html'
+  templateUrl: 'reactive-map.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReactiveMapComponent implements OnInit {
+export class ReactiveMapComponent implements AfterViewInit {
 
   @Input()
-  private data:any[];
-
-  @Input()
-  private map:any;
+  private data:Observable<any[]>;
 
   @Input()
   private width:number;
@@ -24,108 +23,66 @@ export class ReactiveMapComponent implements OnInit {
   private height:number;
 
   private container:d3.Selection<any>;
-  private canvas:d3.Selection<any>;
   private zoomLayer:d3.Selection<any>;
 
   private meteorites:d3.Selection<any>;
-  private projection:any;
 
-  constructor(private elementRef: ElementRef) {
-    this.container = d3.select(elementRef.nativeElement); 
+  private projection = d3.geo.mercator();
+  private radiusScale = d3.scale.pow().exponent(0.4)
+      .domain([0, 20000000])
+      .range([4, 30]);
+
+
+  constructor(private elementRef: ElementRef, private dataService:DataService) {
+    this.container = d3.select(this.elementRef.nativeElement); 
   }
 
-
-ngOnInit() {
-	  this.canvas = this.container.select('#canvas');
+  ngAfterViewInit() {
     this.zoomLayer = this.container.select("#zoom");
-    this.projection = d3.geo.mercator()
 
-    console.log(this.zoomLayer);
+    // subscribe to map/meteorite data
+    this.dataService.getWorldMap().subscribe(m => this.updateMap(m));
+    this.data.subscribe(data => this.updateMeteorites(data));
   }
 
-  ngOnChanges(changes: {[key: string]: SimpleChange}) {
-    console.warn(changes);
-    // if (!this.data || !this.map)
-    //   return;
+  private updateMeteorites(data:any[]) {
+    this.zoomLayer.select("#meteorites")
+      .selectAll("circle")
+      .transition()
+      .duration(250)
+      .attr('opacity', 0)
+      .remove();
+    
+    this.meteorites = this.zoomLayer.select("#meteorites").selectAll('#NONEXISTANT');
+    
+    this.meteorites
+      .data(data.filter(feature => feature.geometry!= null))
+      .enter()
+      .append("circle")
+      .attr("cx", d => this.projection(d.geometry.coordinates)[0])
+		  .attr("cy", d => this.projection(d.geometry.coordinates)[1])
+      .attr("r", d=>this.radiusScale(d.properties.mass)*2)
+      .attr("opacity", "1")
+      .style("fill", "darkred")
+      .transition()
+      .duration(1000)
+		  // .attr("cx", d => this.projection(d.geometry.coordinates)[0])
+		  // .attr("cy", d => this.projection(d.geometry.coordinates)[1])
+      .attr("r", d=>this.radiusScale(d.properties.mass))
+      .attr("opacity", "1")
+      .style("fill", "darkred");    
+  }
 
-    // console.warn('ngOnChanges - data = ' + changes['data'].currentValue);
-    // console.warn('ngOnChanges - map = ' + changes['map'].currentValue);
-
-    if (changes['map'] && changes['map'].currentValue) {
-      // console.warn("map changed: " + changes["map"])
-      // console.warn("DRAWING MAP = THIS SHOULD APPEAR ONLY ONCE")
+  private updateMap(mapData) {
+      console.warn("DRAWING MAP = THIS SHOULD APPEAR ONLY ONCE")
       let path = d3.geo.path().projection(this.projection);
-      let world = this.zoomLayer.select(".map")
-        // .append("g")
-        // .attr('class', "map")
+      this.zoomLayer.select("#map")
         .selectAll("path")
-        .data(this.map.features.filter(feature => feature.properties.continent != "Antarctica"))
+        .data(mapData.features.filter(feature => feature.properties.continent != "Antarctica"))
         .enter()
         .append("path")
         .attr("d", path)
         .style("stroke", "#a6611a")
         .style("fill", "#fee8c8");
-    }
-
-    if (!this.data)
-      return;
-
-    console.warn("Number of meteorites: " + this.data.length)
-
-    let radiusScale = d3.scale.pow().exponent(0.4)
-      .domain(d3.extent(this.data.map(d=>d.properties.mass)))
-      .range([2, 20]);
-
-    this.meteorites = this.zoomLayer.select("#meteorites").selectAll("circle");
-    
-    this.meteorites
-      .data(this.data.filter(feature => feature.geometry!= null))
-      .enter()
-      .append("circle");
-    
-    this.meteorites
-      .data(this.data.filter(feature => feature.geometry!= null))
-		  .attr("cx", d => this.projection(d.geometry.coordinates)[0])
-		  .attr("cy", d => this.projection(d.geometry.coordinates)[1])
-      .attr("r", 10)
-      // .attr("r", d=>radiusScale(d.properties.mass))
-      // .attr("opacity", "0.5")
-      .style("fill", "darkred")
-
-    this.meteorites
-      .data(this.data.filter(feature => feature.geometry!= null))
-      .exit()
-      .remove()
-
-  }
-
-  // handleZoomClick() {
-  //   let scale:number;
-  //   let center:string;
-  //   if (this.zoomed) {
-  //     center = '0 0';
-  //     scale = 1;
-  //   } else {
-  //     center = "-300 -300";
-  //     scale = 4;
-  //   }
-  //   this.zoomed = !this.zoomed;
-  //   this.zoomLayer
-  //     .transition()
-  //     .duration(750)
-  //     .attr('transform', 'translate(' + center + ') scale('+ scale + ')');
-  // }
-
-  getWeight(weight:number):string {
-    if (weight == 0)
-      return "Unknown weight";
-    
-    if (weight < 1000)
-      return "Weight: " + weight + "g";
-    
-    if (weight < 1000000)
-      return "Weight: " + (weight/1000).toFixed(1) + "kg";
-    
-    return "Weight: " + (weight/1000000).toFixed(1) + "t";
   }
 }
