@@ -7,8 +7,7 @@ import 'rxjs/Rx';
 import { DataService } from '../data.service';
 import { ReactiveMapComponent } from '../reactive-map';
 import { AggregatedMeteoritesComponent } from '../aggregated-meteorites';
-import { Weight } from '../weight.pipe';
-import { Na } from '../na.pipe';
+import { NaPipe, WeightPipe } from '../pipes';
 
 const STARTING_YEAR = 1800;
 const END_YEAR = 2015;
@@ -19,30 +18,31 @@ const ANIMATION_SPEED = 200;
   selector: 'app-reactive-meteorite',
   templateUrl: 'reactive-meteorite.component.html',
   directives: [ReactiveMapComponent, AggregatedMeteoritesComponent],
-  pipes: [Weight, Na]
+  pipes: [NaPipe, WeightPipe]
 })
 export class ReactiveMeteoriteComponent implements OnInit {
 
+  // redeclaring constants so they can be used in the view
   private startingYear = STARTING_YEAR;
   private endYear = END_YEAR;
 
-  private data:any[];
-  private worldMap:any;
-
+  // controls
   private runningControl:Control;
   private yearControl:Control;
   private loopControl:Control;
 
+  // observables for all data
   private year:Observable<number>;
   private allMeteorites:Observable<any[]>;
   private currentYearMeteorites:Observable<any[]>;
 
   constructor(private dataService:DataService) {
-    this.dataService.getWorldMap().subscribe(data => this.worldMap = data);
     this.runningControl = new Control(false);
     this.yearControl = new Control(STARTING_YEAR);
     this.loopControl = new Control(true);
+  }
 
+  ngOnInit() {
     /** 
      * We take the observable with all meteorites in GeoJSON format, apply
      * transformations to ease later processing of the data and then
@@ -96,9 +96,6 @@ export class ReactiveMeteoriteComponent implements OnInit {
       return meteorites.filter(m => m.properties.year == year);
     })
     .startWith([]);
-  }
-
-  ngOnInit() {
   }
 
 }

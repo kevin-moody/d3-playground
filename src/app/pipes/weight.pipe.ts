@@ -3,7 +3,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
   name: 'weight'
 })
-export class Weight implements PipeTransform {
+export class WeightPipe implements PipeTransform {
 
   transform(valueString: number): string {
     if (!valueString)
